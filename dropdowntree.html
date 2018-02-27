@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>DropDownTree</title>
     <meta charset="utf-8">
-    
+
     <!-- <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.1.221/styles/kendo.common.min.css" />
     <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.1.221/styles/kendo.default.min.css" />
     <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.1.221/styles/kendo.default.mobile.min.css" />
@@ -20,6 +21,7 @@
     <script src="ext.dropdowntree.js"></script>
     <script src="ext.multiselecttree.js"></script>
 </head>
+
 <body>
     <div>
         <div style="background:gray;width:377px">377px</div>
@@ -42,41 +44,60 @@
     <div>
         <select id='test2'></select>
     </div>
-    
-<script>
 
-/////////////////////////////////////////////////
-// Test1: DropDownTreeView
+    <script>
+        function list2tree(arr, idName, parentName) {
+            var ret = [], map = {};
+            for (var i in arr) {
+                var a = arr[i];
+                a.expanded = true;
+                a.text = a.name;
+                map[a[idName]] = a;
+            }
+            for (var i in arr) {
+                var a = arr[i];
+                if (a[parentName] in map) {
+                    var p = map[a[parentName]];
+                    if (!p.items) p.items = [];
+                    p.items.push(a);
+                } else {
+                    ret.push(a);
+                }
+            }
+            return ret;
+        }
+        /////////////////////////////////////////////////
+        // Test1: DropDownTreeView
 
-var DropDownTreeView = $('#DropDownTreeView').kendoDropDownTreeView({
-    url:'dropdownTree2.json',
-    change:function(e){
-        console.log(e);
-        $('#valSigle').text(this.value());
-    }
-}).data("kendoDropDownTreeView");
+        var DropDownTreeView = $('#DropDownTreeView').kendoDropDownTreeView({
+            url: 'dropdownTree2.json',
+            change: function (e) {
+                console.log(e);
+                $('#valSigle').text(this.value());
+            }
+        }).data("kendoDropDownTreeView");
 
-/////////////////////////////////////////////////
-// Test1: MultiSelectTree
+        /////////////////////////////////////////////////
+        // Test1: MultiSelectTree
 
-var MultiSelectTree = $('#MultiSelectTree').kendoMultiSelectTree({
-    url:'dropdownTree2.json',
-    change:function(e){
-        console.log('change',e);
-        $('#valMulti').text(this.value());
-    }
-}).data("kendoMultiSelectTree");
-
-
-$('#test2').kendoMultiSelect({
-    dataSource: [{text:"1",value:"11"}],
-    dataTextField: "text", dataValueField: "value",
-    autoBind: false
-}).data("kendoMultiSelect");
+        var MultiSelectTree = $('#MultiSelectTree').kendoMultiSelectTree({
+            url: 'dropdownTree2.json',
+            change: function (e) {
+                console.log('change', e);
+                $('#valMulti').text(this.value());
+            }
+        }).data("kendoMultiSelectTree");
 
 
-</script>
-</div>
+        $('#test2').kendoMultiSelect({
+            dataSource: [{ text: "1", value: "11" }],
+            dataTextField: "text", dataValueField: "value",
+            autoBind: false
+        }).data("kendoMultiSelect");
+
+    </script>
+    </div>
 
 </body>
+
 </html>

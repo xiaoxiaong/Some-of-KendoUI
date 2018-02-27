@@ -1,0 +1,38 @@
+[
+    {
+        "name": "ssal022狗蛋测试1服",
+        "pId": "_all",
+        "id": "ssal022",
+        "open": true
+    },
+    {
+        "name": "内网测试版(db_game_t11_1)",
+        "pId": "_all",
+        "id": "ssks001",
+        "open": true
+    },
+    {
+        "name": "内网服务器(db_game_t11_0)",
+        "pId": "_all",
+        "id": "ssks002",
+        "open": true
+    },
+    {
+        "name": "内网稳定版(db_game_t11_2)",
+        "pId": "_all",
+        "id": "ssks1310",
+        "open": true
+    },
+    {
+        "name": "狗蛋测试2服",
+        "pId": "_all",
+        "id": "ssks1312",
+        "open": true
+    },
+    {
+        "name": "所有服务器",
+        "pId": "_null",
+        "id": "_all",
+        "open": true
+    }
+]
