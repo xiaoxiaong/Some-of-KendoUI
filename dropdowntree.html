@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DropDownTree</title>
+    <meta charset="utf-8">
+    
+    <!-- <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.1.221/styles/kendo.common.min.css" />
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.1.221/styles/kendo.default.min.css" />
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.1.221/styles/kendo.default.mobile.min.css" />
+    <script src="https://kendo.cdn.telerik.com/2018.1.221/js/jquery.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2018.1.221/js/kendo.all.min.js"></script> -->
+
+    <link href="2018.1.221/style/kendo.rtl.min.css" rel="stylesheet">
+    <link href="2018.1.221/style/kendo.common.min.css" rel="stylesheet">
+    <link href="2018.1.221/style/kendo.default.min.css" rel="stylesheet">
+    <link href="2018.1.221/style/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="2018.1.221/js/jquery.min.js"></script>
+    <script src="2018.1.221/js/kendo.all.min.js"></script>
+
+    <script src="ext.dropdowntree.js"></script>
+    <script src="ext.multiselecttree.js"></script>
+</head>
+<body>
+    <div>
+        <div style="background:gray;width:377px">377px</div>
+    </div>
+    <br/>
+    <div style="background:rgb(189, 187, 187);width:377px">
+        <h4>单选下拉</h4>
+        <div id="DropDownTreeView" style="width:100%"></div>
+        <br/>
+        <div><span id='valSigle' style="width:100px">-</span></div>
+    </div>
+    <br/>
+    <div style="background:rgb(189, 187, 187);width:377px">
+        <h4>多选下拉</h4>
+        <div id="MultiSelectTree" style="width:100%"></div>
+        <br/>
+        <div><span id='valMulti' style="width:100px">-</span></div>
+    </div>
+    <br/>
+    <div>
+        <select id='test2'></select>
+    </div>
+    
+<script>
+
+/////////////////////////////////////////////////
+// Test1: DropDownTreeView
+
+var DropDownTreeView = $('#DropDownTreeView').kendoDropDownTreeView({
+    url:'dropdownTree2.json',
+    change:function(e){
+        console.log(e);
+        $('#valSigle').text(this.value());
+    }
+}).data("kendoDropDownTreeView");
+
+/////////////////////////////////////////////////
+// Test1: MultiSelectTree
+
+var MultiSelectTree = $('#MultiSelectTree').kendoMultiSelectTree({
+    url:'dropdownTree2.json',
+    change:function(e){
+        console.log('change',e);
+        $('#valMulti').text(this.value());
+    }
+}).data("kendoMultiSelectTree");
+
+
+$('#test2').kendoMultiSelect({
+    dataSource: [{text:"1",value:"11"}],
+    dataTextField: "text", dataValueField: "value",
+    autoBind: false
+}).data("kendoMultiSelect");
+
+
+</script>
+</div>
+
+</body>
+</html>
