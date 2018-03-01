@@ -20,12 +20,15 @@
 
     <script src="ext.dropdowntree.js"></script>
     <script src="ext.multiselecttree.js"></script>
+    <script src="ext.dropdownmultitree.js"></script>
 </head>
 
 <body>
-    <div>
-        <div style="background:gray;width:377px">377px</div>
+    <div style="padding-top: 2em;" id="aaa">
+        <h4>dropdownMu</h4>
+        <p id="result">No nodes checked.</p>
     </div>
+
     <br/>
     <div style="background:rgb(189, 187, 187);width:377px">
         <h4>单选下拉</h4>
@@ -88,13 +91,15 @@
             }
         }).data("kendoMultiSelectTree");
 
+        var DropDownMultiTree = $("#aaa").kendoDropDownMultiTreeView({
+            url: 'dropdownTree2.json'
+        }).data("kendoDropDownMultiTreeView");
 
         $('#test2').kendoMultiSelect({
             dataSource: [{ text: "1", value: "11" }],
             dataTextField: "text", dataValueField: "value",
             autoBind: false
         }).data("kendoMultiSelect");
-
     </script>
     </div>
 
