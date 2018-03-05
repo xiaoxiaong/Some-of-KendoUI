@@ -16,8 +16,7 @@ var MultiSelectTree = kendo.ui.Widget.extend({
         var idTreeView = kendo.format("extTreeView{0}", that._uid)
 
         var $multiSel = $("<select class='k-ext-MultiSelectTree'/>").appendTo(element);
-        // $(element).append("<div id='" + idTreeView + "' class='k-ext-treeview' style='z-index:1;'/>");
-        var $treeviewRootElem = $("<div class='k-ext-treeview' style='z-index:1;'/>").appendTo(element);
+        var $treeviewRootElem = $("<div class='k-ext-treeview' style='z-index:10003;max-height:600px;overflow:scroll;'/>").appendTo(document.body);
 
         var filterTree = function (filterText) {
             // console.log('filterTree: ' + filterText);
@@ -55,7 +54,10 @@ var MultiSelectTree = kendo.ui.Widget.extend({
 
                     // Position the treeview so that it is below the dropdown.
                     var pos = $dropdownRootElem.position();
-                    $treeviewRootElem.css({ "top": pos.top + $dropdownRootElem.height(), "left": pos.left });
+                    $treeviewRootElem.css({
+                        "top": $dropdownRootElem.offset().top + $dropdownRootElem.height(),
+                        "left": $dropdownRootElem.offset().left
+                    });
                     // Display the treeview.
                     $treeviewRootElem.slideToggle('fast', function () {
                         that._multiselect.close();
@@ -86,13 +88,24 @@ var MultiSelectTree = kendo.ui.Widget.extend({
         };
         that._treeview = $treeviewRootElem.kendoTreeView(treeViewOpt).data("kendoTreeView");
         if (options.url) {
-            $.get(options.url, {}, function (ret) { ret = list2tree(ret, 'id', 'pId'); that._treeview.setDataSource(ret); }, 'json');
+            $.get(options.url, {}, function (ret) {
+                ret = list2tree(ret, 'id', 'pId');
+                that._treeview.setDataSource(ret);
+                var values = that._multiselect.value();
+                that.OnValueChanged(values);
+                that.OnTreeCheckChanged();
+            }, 'json');
         }
         var $treeviewRootElem = $(that._treeview.element).closest("div.k-treeview");
 
         // Hide the treeview.
-        $treeviewRootElem.width($dropdownRootElem.width()).css({
-            "max-height": "60%",
+        console.log("宽度", $dropdownRootElem.width())
+        setTimeout(function () {
+            console.log("宽度", $dropdownRootElem.width())
+        }, 2000)
+        $treeviewRootElem.css({
+            // "max-height": "90%",
+            "width": $dropdownRootElem.width() < 280 ? "300px" : $dropdownRootElem.width(),
             "border": "1px solid #dbdbdb",
             "display": "none",
             "position": "absolute",
@@ -104,7 +117,7 @@ var MultiSelectTree = kendo.ui.Widget.extend({
                 && $(e.target).closest("input.k-input").length === 0) { // Ignore clicks on the treetriew.
                 if ($treeviewRootElem.hasClass("k-custom-visible")) { // If visible, then close the treeview.
                     // console.log("multiselect关闭")
-                    that.OnTreeCheckChanged();
+                    that.OnTreeCheckChanged(true);
                     if (that.change) that.change(that._multiselect.value());
                     $treeviewRootElem.slideToggle('fast', function () {
                         $treeviewRootElem.removeClass("k-custom-visible");
@@ -135,23 +148,24 @@ var MultiSelectTree = kendo.ui.Widget.extend({
                 this.getCheckedNodes(node.children.view(), checkedNodes);
         }
     },
-    OnTreeCheckChanged: function () {
+    OnTreeCheckChanged: function (resetValueFromMultiSelect) {
         var checkedNodes = [];
         this.getCheckedNodes(this._treeview.dataSource.view(), checkedNodes);
 
-        var multiSelect = this._multiselect;
-        multiSelect.dataSource.data([]);
-        var multiData = [];//multiSelect.dataSource.data();
-        var array = [];//multiSelect.value().slice();
-        if (checkedNodes.length > 0) {
-            for (var i = 0; i < checkedNodes.length; i++) {
-                multiData.push({ text: checkedNodes[i].text, value: checkedNodes[i].id });
-                array.push(checkedNodes[i].id.toString());
+        if (resetValueFromMultiSelect == true) {
+            var multiSelect = this._multiselect;
+            multiSelect.dataSource.data([]);
+            var multiData = [], values = [];
+            if (checkedNodes.length > 0) {
+                for (var i = 0; i < checkedNodes.length; i++) {
+                    multiData.push({ text: checkedNodes[i].text, value: checkedNodes[i].id });
+                    values.push(checkedNodes[i].id.toString());
+                }
+                multiSelect.dataSource.data(multiData);
             }
-            multiSelect.dataSource.data(multiData);
+            multiSelect.dataSource.filter({});
+            multiSelect.value(values);
         }
-        multiSelect.dataSource.filter({});
-        multiSelect.value(array);
     },
     checkUncheckAllNodes: function (nodes, checked) {
         for (var i = 0; i < nodes.length; i++) {

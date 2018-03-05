@@ -14,11 +14,10 @@ var DropDownMultiTreeView = kendo.ui.Widget.extend({
         this.change = options.change;
         kendo.ui.Widget.fn.init.call(that, element, options);
         that._uid = new Date().getTime();
-        var idDropDown = kendo.format("extDropDown{0}", that._uid);
         var idInputBox = kendo.format("extInputBox{0}", that._uid);
 
         var $dropDown = $("<input class='k-ext-dropdown' style='width:100%'/>").appendTo(element);
-        var $treeviewRootElem = $("<div id='con" + idDropDown + "' class='k-DropDownTreeView-root' style='z-index:1;'></div>").appendTo(element);
+        var $treeviewRootElem = $("<div class='k-DropDownTreeView-root' style='z-index:10003;'></div>").appendTo(document.body);
         $("<span class='k-list-filter'><input id='" + idInputBox + "' class='k-textbox' style='display: inline-block; width:100%;' tabindex='0'><span class='k-icon k-i-zoom'></span></span>").appendTo($treeviewRootElem);
         var $treeView = $("<div class='k-ext-treeview' style='max-height:600px;overflow:scroll;' />").appendTo($treeviewRootElem);
         $inputBox = $('#' + idInputBox);
@@ -65,14 +64,9 @@ var DropDownMultiTreeView = kendo.ui.Widget.extend({
 
                     // Position the treeview so that it is below the dropdown.
                     $treeviewRootElem.css({
-                        "top": $dropdownRootElem.position().top + $dropdownRootElem.height(),
-                        "left": $dropdownRootElem.position().left
+                        "top": $dropdownRootElem.offset().top + $dropdownRootElem.height(),
+                        "left": $dropdownRootElem.offset().left
                     });
-                    //var ii = $('#con'+idDropDown).find('input');
-                    //ii.focus();
-                    //console.log(ii);
-                    //var oInput = document.getElementById(idInputBox);
-                    //oInput.focus();
 
                     $inputBox.val('');
                     $inputBox.focus();
@@ -86,35 +80,38 @@ var DropDownMultiTreeView = kendo.ui.Widget.extend({
             }
         }).data("kendoDropDownList");
 
-        //if (options.dropDownWidth) that._dropdown._inputWrapper.width(options.dropDownWidth);
-
         var $dropdownRootElem = $(that._dropdown.element).closest("span.k-dropdown");
 
         // Create the treeview.
         var treeViewOpt = options.treeview ? options.treeview : {};
         treeViewOpt.checkboxes = { checkChildren: true };
         treeViewOpt.check = function () {
-            //console.log('check')
             $treeviewRootElem.addClass("k-custom-visible");
-            that.OnTreeCheckChanged();
+            that.OnTreeCheckChanged(true);
         };
         //console.log("treeViewOpt",treeViewOpt)
         that._treeview = $treeView.kendoTreeView(treeViewOpt).data("kendoTreeView");
 
         that._treeview.bind("select", function (e) {
-            if (e && e.node){
+            if (e && e.node) {
                 var d = this.dataItem(e.node);
                 d.set("checked", !d.checked);
-                that.OnTreeCheckChanged();
-            } 
+                that.OnTreeCheckChanged(true);
+            }
         });
         if (options.url) {
-            $.get(options.url, {}, function (ret) { ret = list2tree(ret, 'id', 'pId'); that._treeview.setDataSource(ret); }, 'json');
+            $.get(options.url, {}, function (ret) {
+                ret = list2tree(ret, 'id', 'pId');
+                that._treeview.setDataSource(ret);
+                //console.log('DropDownMultiTreeView', that._v);
+                that.OnValueChanged(that._v);
+                that.OnTreeCheckChanged(false);
+            }, 'json');
         }
 
         var defBackground = that._dropdown.list.css("background-color");
-
-        $treeviewRootElem.width($dropdownRootElem.width()).css({
+        $treeviewRootElem.css({
+            "width": $dropdownRootElem.width() < 280 ? "300px" : $dropdownRootElem.width(),
             // "max-height": "600px",
             "border": "1px solid #dbdbdb",
             "display": "none",
@@ -131,13 +128,10 @@ var DropDownMultiTreeView = kendo.ui.Widget.extend({
             if ($(e.target).closest("div.k-DropDownTreeView-root").length === 0
                 && $(e.target).closest("input.k-ext-dropdown").length === 0) {// Ignore clicks on the treetriew.
                 if ($treeviewRootElem.hasClass("k-custom-visible")) { // If visible, then close the treeview.
-                    // console.log("dropdown关闭")
-                    that.OnTreeCheckChanged();
-                    if (that.change) that.change(that.value());
+                    that.OnTreeCheckChanged(true);
                     $treeviewRootElem.slideToggle('fast', function () {
                         $treeviewRootElem.removeClass("k-custom-visible");
                     });
-                    //return false;
                 }
             }
         });
@@ -146,11 +140,11 @@ var DropDownMultiTreeView = kendo.ui.Widget.extend({
     value: function (v) {
         if (v !== undefined) {
             //console.log('setValue',v)
+            this._v = v;
             this.OnValueChanged(v);
-            this.OnTreeCheckChanged();
-            // $(this._treeview.element).closest("div.k-treeview").hide();
+            this.OnTreeCheckChanged(false);
             this.conTreeView.hide();
-        }else {
+        } else {
             //console.log('getValue',this._v)
             return this._v;
         }
@@ -164,25 +158,26 @@ var DropDownMultiTreeView = kendo.ui.Widget.extend({
             if (node.checked && !node.hasChildren) // 包含子节点的不算
                 checkedNodes.push({ text: node.text, id: node.id });
             if (node.hasChildren)
-                this.getCheckedNodes(node.children.view(), checkedNodes, node.checked?null:texts);
+                this.getCheckedNodes(node.children.view(), checkedNodes, node.checked ? null : texts);
         }
     },
-    OnTreeCheckChanged: function () {
+    OnTreeCheckChanged: function (resetValueFromTree) {
         var checkedNodes = [];
         var texts = [];
         this.getCheckedNodes(this._treeview.dataSource.view(), checkedNodes, texts);
-
-        var values = [];
-        if (checkedNodes.length > 0) {
-            for (var i = 0; i < checkedNodes.length; i++) {
-                var node = checkedNodes[i];
-                values.push(node.id.toString());
+        $(this._dropdown.element).closest("span.k-dropdown").find("span.k-input").text(texts.join(','));
+        if (resetValueFromTree) {
+            var values = [];
+            if (checkedNodes.length > 0) {
+                for (var i = 0; i < checkedNodes.length; i++) {
+                    var node = checkedNodes[i];
+                    values.push(node.id.toString());
+                }
             }
+            this._v = values;
+            if (this.change) this.change(values);
+            //console.log('DropDownMultiTreeView', values);
         }
-        this._v = values;
-        var root = $(this._dropdown.element).closest("span.k-dropdown");
-        //console.log(this._v, root.find("span.k-input"));
-        root.find("span.k-input").text(texts.join(','));
     },
     checkUncheckAllNodes: function (nodes, checked) {
         for (var i = 0; i < nodes.length; i++) {
@@ -193,7 +188,7 @@ var DropDownMultiTreeView = kendo.ui.Widget.extend({
         }
     },
     OnValueChanged: function (values) {
-        //console.log('OnValueChanged', values);
+        //console.log('OnValueChanged', values, this._treeview.dataSource.data());
         // Uncheck all
         this.checkUncheckAllNodes(this._treeview.dataSource.view(), false);
 
