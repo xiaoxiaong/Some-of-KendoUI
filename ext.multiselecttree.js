@@ -16,7 +16,7 @@ var MultiSelectTree = kendo.ui.Widget.extend({
         var idTreeView = kendo.format("extTreeView{0}", that._uid)
 
         var $multiSel = $("<select class='k-ext-MultiSelectTree'/>").appendTo(element);
-        var $treeviewRootElem = $("<div class='k-ext-treeview' style='z-index:10003;max-height:600px;overflow:scroll;'/>").appendTo(document.body);
+        var $treeviewRootElem = $("<div class='k-ext-treeview' style='z-index:100003;max-height:600px;overflow:scroll;'/>").appendTo(document.body);
 
         var filterTree = function (filterText) {
             // console.log('filterTree: ' + filterText);

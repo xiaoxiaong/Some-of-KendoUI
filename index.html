@@ -24,35 +24,26 @@
 </head>
 
 <body>
-    <div style="padding-top: 2em;" id="aaa">
-        <h4>dropdownMu</h4>
-        <p id="result">No nodes checked.</p>
-    </div>
 
+    <h4>单选下拉</h4>
+    <div id="DropDownTreeView" style="width:100%"></div>
+    <p id="valSigle">No nodes checked.</p>
     <br/>
-    <div style="background:rgb(189, 187, 187);width:377px">
-        <h4>单选下拉</h4>
-        <div id="DropDownTreeView" style="width:100%"></div>
-        <br/>
-        <div><span id='valSigle' style="width:100px">-</span></div>
-    </div>
     <br/>
-    <div style="background:rgb(189, 187, 187);width:377px">
-        <h4>多选下拉</h4>
-        <div id="MultiSelectTree" style="width:100%"></div>
-        <br/>
-        <div><span id='valMulti' style="width:100px">-</span></div>
-    </div>
+    <h4>多选下拉1</h4>
+    <div id="MultiSelectTree" style="width:100%"></div>
+    <p id="valMulti1">No nodes checked.</p>
     <br/>
-    <div>
-        <select id='test2'></select>
-    </div>
+    <h4>多选下拉2</h4>
+    <div style="padding-top: 2em;" id="aaa"></div>
+    <p id="valMulti2">No nodes checked.</p>
 
     <script>
         function list2tree(arr, idName, parentName) {
             var ret = [], map = {};
             for (var i in arr) {
                 var a = arr[i];
+                // a.expanded = a.open != null ? a.open : true;
                 a.expanded = true;
                 a.text = a.name;
                 map[a[idName]] = a;
@@ -69,37 +60,27 @@
             }
             return ret;
         }
-        /////////////////////////////////////////////////
-        // Test1: DropDownTreeView
 
         var DropDownTreeView = $('#DropDownTreeView').kendoDropDownTreeView({
-            url: 'dropdownTree2.json',
+            url: 'test_data_select.json',
             change: function (e) {
-                console.log(e);
                 $('#valSigle').text(this.value());
             }
         }).data("kendoDropDownTreeView");
 
-        /////////////////////////////////////////////////
-        // Test1: MultiSelectTree
-
         var MultiSelectTree = $('#MultiSelectTree').kendoMultiSelectTree({
-            url: 'dropdownTree2.json',
+            url: 'test_data_select.json',
             change: function (e) {
-                console.log('change', e);
                 $('#valMulti').text(this.value());
             }
         }).data("kendoMultiSelectTree");
 
         var DropDownMultiTree = $("#aaa").kendoDropDownMultiTreeView({
-            url: 'dropdownTree2.json'
+            url: 'test_data_select.json',
+            change: function (e) {
+                $('#valSigle').text(this.value());
+            }
         }).data("kendoDropDownMultiTreeView");
-
-        $('#test2').kendoMultiSelect({
-            dataSource: [{ text: "1", value: "11" }],
-            dataTextField: "text", dataValueField: "value",
-            autoBind: false
-        }).data("kendoMultiSelect");
     </script>
     </div>
 

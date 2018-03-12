@@ -17,7 +17,7 @@ var DropDownMultiTreeView = kendo.ui.Widget.extend({
         var idInputBox = kendo.format("extInputBox{0}", that._uid);
 
         var $dropDown = $("<input class='k-ext-dropdown' style='width:100%'/>").appendTo(element);
-        var $treeviewRootElem = $("<div class='k-DropDownTreeView-root' style='z-index:10003;'></div>").appendTo(document.body);
+        var $treeviewRootElem = $("<div class='k-DropDownTreeView-root' style='z-index:100003;'></div>").appendTo(document.body);
         $("<span class='k-list-filter'><input id='" + idInputBox + "' class='k-textbox' style='display: inline-block; width:100%;' tabindex='0'><span class='k-icon k-i-zoom'></span></span>").appendTo($treeviewRootElem);
         var $treeView = $("<div class='k-ext-treeview' style='max-height:600px;overflow:scroll;' />").appendTo($treeviewRootElem);
         $inputBox = $('#' + idInputBox);
@@ -153,12 +153,16 @@ var DropDownMultiTreeView = kendo.ui.Widget.extend({
         var node;
         for (var i = 0; i < nodes.length; i++) {
             node = nodes[i];
+            // if (node.checked)
+            //     // console.log("name：" + node.text + "hasChildren？",node.items)
+            //     console.log(node.items)
             if (node.checked && texts)
                 texts.push(node.text);
             if (node.checked && !node.hasChildren) // 包含子节点的不算
                 checkedNodes.push({ text: node.text, id: node.id });
-            if (node.hasChildren)
+            if (node.hasChildren) {
                 this.getCheckedNodes(node.children.view(), checkedNodes, node.checked ? null : texts);
+            }
         }
     },
     OnTreeCheckChanged: function (resetValueFromTree) {
